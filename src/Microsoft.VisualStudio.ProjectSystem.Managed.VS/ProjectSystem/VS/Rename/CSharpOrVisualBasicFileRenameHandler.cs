@@ -35,10 +35,10 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Rename
         }
 
         internal CSharpOrVisualBasicFileRenameHandler(IUnconfiguredProjectVsServices projectVsServices,
-                                              Workspace workspace,
-                                              IEnvironmentOptions environmentOptions,
-                                              IUserNotificationServices userNotificationServices,
-                                              IRoslynServices roslynServices)
+                                                      Workspace workspace,
+                                                      IEnvironmentOptions environmentOptions,
+                                                      IUserNotificationServices userNotificationServices,
+                                                      IRoslynServices roslynServices)
         {
             _projectVsServices = projectVsServices;
             _workspace = workspace;
@@ -77,7 +77,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Rename
                 return;
 
             // Check if there are any symbols that need to be renamed
-            (success, _) = await TryGetSymbolToRename(oldName, newFilePath, isCaseSensitive);
+            (success, _) = await TryGetSymbolToRename(oldName, oldFilePath, newFilePath, isCaseSensitive);
             if (!success)
                 return;
 
@@ -87,7 +87,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Rename
                 return;
 
             // Perform the rename operation
-            Solution renamedSolution = await GetRenamedSolutionAsync(oldName, newFilePath, isCaseSensitive);
+            Solution renamedSolution = await GetRenamedSolutionAsync(oldName, oldFilePath, newFilePath, isCaseSensitive);
             if (renamedSolution == null)
                 return;
 
@@ -139,13 +139,13 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Rename
                     ? StringComparison.Ordinal
                     : StringComparison.OrdinalIgnoreCase));
 
-        private async Task<(bool success, ISymbol symbolToRename)> TryGetSymbolToRename(string oldName, string newFileName, bool isCaseSensitive)
+        private async Task<(bool success, ISymbol symbolToRename)> TryGetSymbolToRename(string oldName, string oldFilePath, string newFileName, bool isCaseSensitive)
         {
             Project project = GetCurrentProject();
             if (project == null)
                 return (false, null);
 
-            Document newDocument = GetDocument(project, newFileName);
+            Document newDocument = GetDocument(project, oldFilePath, newFileName);
             if (newDocument == null)
                 return (false, null);
 
@@ -163,6 +163,15 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Rename
                 return (false, null);
 
             return (true, semanticModel.GetDeclaredSymbol(declaration));
+        }
+
+        private static Document GetDocument(Project project, string oldFilePath, string newFilePath)
+        {
+            Document newDocument = GetDocument(project, newFilePath);
+            if (newDocument != null)
+                return newDocument;
+
+            return GetDocument(project, oldFilePath);
         }
 
         private static Document GetDocument(Project project, string filePath) =>
@@ -202,9 +211,9 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Rename
             return true;
         }
 
-        private async Task<Solution> GetRenamedSolutionAsync(string oldName, string newFileName, bool isCaseSensitive)
+        private async Task<Solution> GetRenamedSolutionAsync(string oldName, string oldFileName, string newFileName, bool isCaseSensitive)
         {
-            (bool success, ISymbol symbolToRename) = await TryGetSymbolToRename(oldName, newFileName, isCaseSensitive);
+            (bool success, ISymbol symbolToRename) = await TryGetSymbolToRename(oldName, oldFileName, newFileName, isCaseSensitive);
             if (!success)
                 return null;
 

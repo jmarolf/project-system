@@ -30,6 +30,15 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Rename
                                                       IEnvironmentOptions environmentOptions,
                                                       IUserNotificationServices userNotificationServices,
                                                       IRoslynServices roslynServices)
+            : this(projectVsServices, workspace as Workspace, environmentOptions, userNotificationServices, roslynServices)
+        {
+        }
+
+        internal CSharpOrVisualBasicFileRenameHandler(IUnconfiguredProjectVsServices projectVsServices,
+                                              Workspace workspace,
+                                              IEnvironmentOptions environmentOptions,
+                                              IUserNotificationServices userNotificationServices,
+                                              IRoslynServices roslynServices)
         {
             _projectVsServices = projectVsServices;
             _workspace = workspace;

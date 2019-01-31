@@ -68,10 +68,15 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Rename
                 Solution solution = ws.AddSolution(InitializeWorkspace(projectId, newFilePath, sourceCode, language));
                 Project project = (from d in solution.Projects where d.Id == projectId select d).FirstOrDefault();
 
-                var environmentOptionsFactory = IEnvironmentOptionsFactory.Implement((string category, string page, string property, bool defaultValue) => { return true; });
+                var environmentOptionsFactory = IEnvironmentOptionsFactory.Implement((string category, string page, string property, bool defaultValue) => true);
+                var unconfiguredProject = UnconfiguredProjectFactory.Create(filePath: $@"C:\project1.{ProjectFileExtension}");
+                var projectServices = IUnconfiguredProjectVsServicesFactory.Implement(
+                    threadingServiceCreator: () => IProjectThreadingServiceFactory.Create(),
+                    unconfiguredProjectCreator: () => unconfiguredProject);
+                var unconfiguredProjectTasksService = IUnconfiguredProjectTasksServiceFactory.Create();
 
-                var renamer = new CSharpOrVisualBasicFileRenameHandler(ws, IProjectThreadingServiceFactory.Create(), userNotificationServices, environmentOptionsFactory, roslynServices, project, oldFilePath, newFilePath);
-                await renamer.RenameAsync(project)
+                var renamer = new CSharpOrVisualBasicFileRenameHandler(projectServices, ws, environmentOptionsFactory, userNotificationServices, roslynServices);
+                await renamer.HandleRenameAsync(oldFilePath, newFilePath)
                              .TimeoutAfter(TimeSpan.FromSeconds(1));
             }
         }

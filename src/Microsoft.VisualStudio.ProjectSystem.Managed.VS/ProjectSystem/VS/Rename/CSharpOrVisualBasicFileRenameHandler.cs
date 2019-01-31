@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Globalization;
@@ -15,7 +16,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Rename
 {
     [Export(typeof(IFileRenameHandler))]
     [AppliesTo(ProjectCapability.CSharpOrVisualBasic)]
-    internal sealed class Renamer : IFileRenameHandler
+    internal sealed class CSharpOrVisualBasicFileRenameHandler : IFileRenameHandler
     {
         private readonly IUnconfiguredProjectVsServices _projectVsServices;
         private readonly Workspace _workspace;
@@ -24,11 +25,11 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Rename
         private readonly IRoslynServices _roslynServices;
 
         [ImportingConstructor]
-        internal Renamer(IUnconfiguredProjectVsServices projectVsServices,
-                         VisualStudioWorkspace workspace,
-                         IEnvironmentOptions environmentOptions,
-                         IUserNotificationServices userNotificationServices,
-                         IRoslynServices roslynServices)
+        internal CSharpOrVisualBasicFileRenameHandler(IUnconfiguredProjectVsServices projectVsServices,
+                                                      VisualStudioWorkspace workspace,
+                                                      IEnvironmentOptions environmentOptions,
+                                                      IUserNotificationServices userNotificationServices,
+                                                      IRoslynServices roslynServices)
         {
             _projectVsServices = projectVsServices;
             _workspace = workspace;

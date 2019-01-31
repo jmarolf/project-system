@@ -3,7 +3,7 @@
 using System;
 using System.Threading;
 
-namespace Microsoft.VisualStudio.ProjectSystem
+namespace Microsoft.VisualStudio.ProjectSystem.Waiting
 {
     internal interface IWaitContext : IDisposable
     {

@@ -32,6 +32,9 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Waiting
 
             public T WaitForOperation<T>(string title, string message, bool allowCancel, Func<CancellationToken, T> action)
             {
+                if (typeof(T) == typeof(Task))
+                    throw new ArgumentException(nameof(T));
+
                 (_, T result) = WaitForOperationWithResult(title, message, allowCancel, action);
                 return result;
             }

@@ -2,6 +2,8 @@
 
 using System;
 using System.Threading.Tasks;
+
+using Microsoft.VisualStudio.Mocks;
 using Microsoft.VisualStudio.ProjectSystem.VS.Waiting;
 using Microsoft.VisualStudio.ProjectSystem.Waiting;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -17,10 +19,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Waiter
         [Fact]
         public static async Task Dispose_Test()
         {
-            bool isCancelable = false;
-            string title = "";
-            string message = "";
-            var (instance, _) = await CreateAsync(title, message, isCancelable);
+            var (instance, _) = await CreateAsync();
             instance.Dispose();
             Assert.True(instance.IsDisposed);
         }
@@ -28,10 +27,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Waiter
         [Fact]
         public static async Task DisposeAsync_Test()
         {
-            bool isCancelable = false;
-            string title = "";
-            string message = "";
-            var (instance, _) = await CreateAsync(title, message, isCancelable);
+            var (instance, _) = await CreateAsync();
             await instance.DisposeAsync();
             Assert.True(instance.IsDisposed);
         }
@@ -39,10 +35,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Waiter
         [Fact]
         public static async Task UsingBlock_Test()
         {
-            bool isCancelable = false;
-            string title = "";
-            string message = "";
-            var (instance, _) = await CreateAsync(title, message, isCancelable);
+            var (instance, _) = await CreateAsync();
             using (instance)
             {
                 Assert.True(!instance.IsDisposed);
@@ -52,18 +45,13 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Waiter
         [Fact]
         public static async Task WaitForOperation_Exception_Test()
         {
-            bool isCancelable = false;
-            string title = "";
-            string message = "";
-            var (instance, cancel) = await CreateAsync(title, message, isCancelable);
+            var (instance, _) = await CreateAsync();
             using (instance)
             {
                 Assert.Throws<Exception>(() =>
                 {
-                    instance.WaitForAsyncOperation(title, message, isCancelable, token =>
-                    {
-                        throw new Exception();
-                    });
+                    instance.WaitForAsyncOperation("", "", false, _
+                        => throw new Exception());
                 });
 
                 Assert.True(!instance.IsDisposed);
@@ -73,19 +61,27 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Waiter
         [Fact]
         public static async Task WaitForOperation_Wrapped_Exception_Test()
         {
-            bool isCancelable = false;
-            string title = "";
-            string message = "";
-            var (instance, cancel) = await CreateAsync(title, message, isCancelable);
+            var (instance, _) = await CreateAsync();
             using (instance)
             {
                 Assert.Throws<Exception>(() =>
                 {
-                    instance.WaitForAsyncOperation(title, message, isCancelable, async token =>
-                    {
-                        await Task.FromException(new Exception());
-                    });
+                    instance.WaitForAsyncOperation("", "", false, async _ 
+                        => await Task.FromException(new Exception()));
                 });
+
+                Assert.True(!instance.IsDisposed);
+            }
+        }
+
+        [Fact]
+        public static async Task WaitForOperation_Wrapped_Canceled_Test()
+        {
+            var (instance, _) = await CreateAsync();
+            using (instance)
+            {
+                instance.WaitForAsyncOperation("", "", false, async _
+                    => await Task.FromException(new OperationCanceledException()));
 
                 Assert.True(!instance.IsDisposed);
             }
@@ -93,32 +89,28 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Waiter
 
 
         [Fact]
-        public static async Task WaitForOperation_Wrapped_Canceled_Test()
+        public static async Task WaitForOperation_DoNotReturnTask_Test()
         {
-            bool isCancelable = false;
-            string title = "";
-            string message = "";
-            var (instance, cancel) = await CreateAsync(title, message, isCancelable);
+            var (instance, _) = await CreateAsync();
             using (instance)
             {
-                instance.WaitForOperation(title, message, isCancelable, token =>
+                Assert.Throws<ArgumentException>(() =>
                 {
-                    Task.FromException(new OperationCanceledException());
+                    instance.WaitForOperation("", "", false, async _ =>
+                    {
+                        await Task.FromException(new OperationCanceledException());
+                    });
                 });
-                Assert.True(!instance.IsDisposed);
             }
         }
 
         [Fact]
         public static async Task WaitForOperation_Wrapped_Canceled_Test2()
         {
-            bool isCancelable = false;
-            string title = "";
-            string message = "";
-            var (instance, cancel) = await CreateAsync(title, message, isCancelable);
+            var (instance, _) = await CreateAsync();
             using (instance)
             {
-                instance.WaitForAsyncOperation(title, message, isCancelable, async token =>
+                instance.WaitForAsyncOperation("", "", false, async _ =>
                 {
                     await Task.WhenAll(
                         Task.Run(() => throw new OperationCanceledException()),
@@ -131,13 +123,10 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Waiter
         [Fact]
         public static async Task WaitForOperation_Wrapped_Canceled_Test3()
         {
-            bool isCancelable = false;
-            string title = "";
-            string message = "";
-            var (instance, _) = await CreateAsync(title, message, isCancelable);
+            var (instance, _) = await CreateAsync();
             using (instance)
             {
-                instance.WaitForOperation(title, message, isCancelable, token =>
+                instance.WaitForOperation("", "", false, _ =>
                 {
                     throw new AggregateException(new[] { new OperationCanceledException(), new OperationCanceledException() });
                 });
@@ -154,7 +143,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Waiter
             string title = "Test01";
             string message = "Testing01";
             var (instance, _) = await CreateAsync(title, message, isCancelable);
-            instance.WaitForOperation(title, message, isCancelable, token =>
+            instance.WaitForOperation(title, message, isCancelable, _ =>
             {
                 wasCalled = true;
             });
@@ -170,7 +159,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Waiter
             string title = "Test01";
             string message = "Testing01";
             var (instance, _) = await CreateAsync(title, message, isCancelable);
-            instance.WaitForOperation(title, message, isCancelable, token =>
+            instance.WaitForOperation(title, message, isCancelable, _ =>
             {
                 wasCalled = true;
                 throw new OperationCanceledException();
@@ -188,7 +177,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Waiter
             string title = "Test02";
             string message = "Testing02";
             var (instance, _) = await CreateAsync(title, message, isCancelable);
-            instance.WaitForOperationWithResult(title, message, isCancelable, token =>
+            instance.WaitForOperationWithResult(title, message, isCancelable, _ =>
             {
                 wasCalled = true;
             });
@@ -204,7 +193,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Waiter
             string title = "Test02";
             string message = "Testing02";
             var (instance, _) = await CreateAsync(title, message, isCancelable);
-            instance.WaitForOperationWithResult(title, message, isCancelable, token =>
+            instance.WaitForOperationWithResult(title, message, isCancelable, _ =>
             {
                 wasCalled = true;
                 throw new OperationCanceledException();
@@ -221,7 +210,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Waiter
             string title = "Test03";
             string message = "Testing03";
             var (instance, _) = await CreateAsync(title, message, isCancelable);
-            instance.WaitForAsyncOperation(title, message, isCancelable, token =>
+            instance.WaitForAsyncOperation(title, message, isCancelable, _ =>
             {
                 wasCalled = true;
                 return Task.CompletedTask;
@@ -238,7 +227,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Waiter
             string title = "Test03";
             string message = "Testing03";
             var (instance, _) = await CreateAsync(title, message, isCancelable);
-            instance.WaitForAsyncOperation(title, message, isCancelable, token =>
+            instance.WaitForAsyncOperation(title, message, isCancelable, _ =>
             {
                 wasCalled = true;
                 throw new OperationCanceledException();
@@ -255,7 +244,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Waiter
             string title = "Test04";
             string message = "Testing04";
             var (instance, _) = await CreateAsync(title, message, isCancelable);
-            var result = instance.WaitForAsyncOperationWithResult(title, message, isCancelable, token =>
+            var result = instance.WaitForAsyncOperationWithResult(title, message, isCancelable, _ =>
             {
                 wasCalled = true;
                 return Task.CompletedTask;
@@ -273,7 +262,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Waiter
             string title = "Test04";
             string message = "Testing04";
             var (instance, _) = await CreateAsync(title, message, isCancelable);
-            var result = instance.WaitForAsyncOperationWithResult(title, message, isCancelable, token =>
+            var result = instance.WaitForAsyncOperationWithResult(title, message, isCancelable, _ =>
             {
                 wasCalled = true;
                 throw new OperationCanceledException();
@@ -290,7 +279,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Waiter
             string title = "Test05";
             string message = "Testing05";
             var (instance, _) = await CreateAsync(title, message, isCancelable);
-            var result = instance.WaitForOperation(title, message, isCancelable, token =>
+            var result = instance.WaitForOperation(title, message, isCancelable, _ =>
             {
                 return 42;
             });
@@ -304,7 +293,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Waiter
             string title = "Test05";
             string message = "Testing05";
             var (instance, _) = await CreateAsync(title, message, isCancelable);
-            var result = instance.WaitForOperation(title, message, isCancelable, token =>
+            var result = instance.WaitForOperation(title, message, isCancelable, _ =>
             {
                 if (isCancelable)
                 {
@@ -324,7 +313,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Waiter
             string title = "Test06";
             string message = "Testing06";
             var (instance, _) = await CreateAsync(title, message, isCancelable);
-            var (cancelled, result) = instance.WaitForOperationWithResult(title, message, isCancelable, token =>
+            var (cancelled, result) = instance.WaitForOperationWithResult(title, message, isCancelable, _ =>
             {
                 return 42;
             });
@@ -338,7 +327,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Waiter
             string title = "Test06";
             string message = "Testing06";
             var (instance, _) = await CreateAsync(title, message, isCancelable);
-            var (cancelled, result) = instance.WaitForOperationWithResult(title, message, isCancelable, token =>
+            var (cancelled, result) = instance.WaitForOperationWithResult(title, message, isCancelable, _ =>
             {
                 if (isCancelable)
                 {
@@ -359,7 +348,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Waiter
             string title = "Test07";
             string message = "Testing07";
             var (instance, _) = await CreateAsync(title, message, isCancelable);
-            var result = instance.WaitForAsyncOperation(title, message, isCancelable, token =>
+            var result = instance.WaitForAsyncOperation(title, message, isCancelable, _ =>
             {
                 return Task.FromResult(42);
             });
@@ -373,7 +362,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Waiter
             string title = "Test07";
             string message = "Testing07";
             var (instance, _) = await CreateAsync(title, message, isCancelable);
-            object result = instance.WaitForAsyncOperation(title, message, isCancelable, token =>
+            object result = instance.WaitForAsyncOperation(title, message, isCancelable, _ =>
             {
                 if (isCancelable)
                 {
@@ -393,7 +382,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Waiter
             string title = "Test08";
             string message = "Testing08";
             var (instance, _) = await CreateAsync(title, message, isCancelable);
-            var (_, result) = instance.WaitForAsyncOperationWithResult(title, message, isCancelable, token =>
+            var (_, result) = instance.WaitForAsyncOperationWithResult(title, message, isCancelable, _ =>
             {
                 return Task.FromResult(42);
             });
@@ -407,7 +396,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Waiter
             string title = "Test08";
             string message = "Testing08";
             var (instance, _) = await CreateAsync(title, message, isCancelable);
-            var (canceled, result) = instance.WaitForAsyncOperationWithResult(title, message, isCancelable, token =>
+            var (canceled, result) = instance.WaitForAsyncOperationWithResult(title, message, isCancelable, _ =>
             {
                 if (isCancelable)
                 {
@@ -438,59 +427,12 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Waiter
             Assert.True(wasCalled);
         }
 
-        private delegate void CreateInstanceCallback(out IVsThreadedWaitDialog2 ppIVsThreadedWaitDialog);
-
-        private static async Task<(VisualStudioOperationWaitIndicator.Instance, Action cancel)> CreateAsync(string title, string message, bool isCancelable)
+        private static async Task<(VisualStudioOperationWaitIndicator.Instance, Action cancel)> CreateAsync(string title = "", string message = "", bool isCancelable = false)
         {
-            IVsThreadedWaitDialogCallback callback = null;
             var threadingService = IProjectThreadingServiceFactory.Create();
             var threadedWaitDialogFactoryServiceMock = new Mock<IVsService<SVsThreadedWaitDialogFactory, IVsThreadedWaitDialogFactory>>();
-            var threadedWaitDialogFactoryMock = new Mock<IVsThreadedWaitDialogFactory>();
-            var threadedWaitDialogMock = new Mock<IVsThreadedWaitDialog3>();
-            threadedWaitDialogMock.Setup(m => m.StartWaitDialogWithCallback(
-                It.IsNotNull<string>(),
-                It.IsNotNull<string>(),
-                It.Is<string>(s => s == null),
-                It.Is<object>(s => s == null),
-                It.Is<string>(s => s == null),
-                It.IsAny<bool>(),
-                It.IsInRange(0, int.MaxValue, Range.Inclusive),
-                It.Is<bool>(v => v == false),
-                It.Is<int>(i => i == 0),
-                It.Is<int>(i => i == 0),
-                It.IsNotNull<IVsThreadedWaitDialogCallback>()))
-                .Callback((string szWaitCaption,
-                           string szWaitMessage,
-                           string szProgressText,
-                           object varStatusBmpAnim,
-                           string szStatusBarText,
-                           bool fIsCancelable,
-                           int iDelayToShowDialog,
-                           bool fShowProgress,
-                           int iTotalSteps,
-                           int iCurrentStep,
-                           IVsThreadedWaitDialogCallback pCallback) =>
-                {
-                    Assert.Equal(title, szWaitCaption);
-                    Assert.Equal(message, szWaitMessage);
-                    Assert.Equal(isCancelable, fIsCancelable);
-                    callback = pCallback;
-                });
-            threadedWaitDialogMock.Setup(m => m.EndWaitDialog(out It.Ref<int>.IsAny));
-            var threadedWaitDialog = threadedWaitDialogMock.Object;
-            threadedWaitDialogFactoryMock
-                .Setup(m => m.CreateInstance(out It.Ref<IVsThreadedWaitDialog2>.IsAny))
-                .Callback(new CreateInstanceCallback((out IVsThreadedWaitDialog2 ppIVsThreadedWaitDialog) =>
-                {
-                    ppIVsThreadedWaitDialog = threadedWaitDialog;
-                }))
-                .Returns(HResult.OK);
-            threadedWaitDialogFactoryServiceMock.Setup(m => m.GetValueAsync()).ReturnsAsync(threadedWaitDialogFactoryMock.Object);
-
-            Action cancel = () =>
-            {
-                callback?.OnCanceled();
-            };
+            var (threadedWaitDialogFactory, cancel ) = IVsThreadedWaitDialogFactoryFactory.Create(title, message, isCancelable);
+            threadedWaitDialogFactoryServiceMock.Setup(m => m.GetValueAsync()).ReturnsAsync(threadedWaitDialogFactory);
 
             var instance = new VisualStudioOperationWaitIndicator.Instance(threadingService, threadedWaitDialogFactoryServiceMock.Object);
             await instance.InitializeAsync();

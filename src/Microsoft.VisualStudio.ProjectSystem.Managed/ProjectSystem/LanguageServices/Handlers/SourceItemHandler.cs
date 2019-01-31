@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 
 using Microsoft.VisualStudio.ProjectSystem.Logging;
+using Microsoft.VisualStudio.ProjectSystem.Rename;
 
 namespace Microsoft.VisualStudio.ProjectSystem.LanguageServices.Handlers
 {
@@ -26,6 +27,9 @@ namespace Microsoft.VisualStudio.ProjectSystem.LanguageServices.Handlers
         {
             _project = project;
         }
+
+        [ImportMany]
+        private readonly IEnumerable<IFileRenameHandler> _fileRenameHandlers = null;
 
         public string ProjectEvaluationRule
         {
@@ -69,6 +73,15 @@ namespace Microsoft.VisualStudio.ProjectSystem.LanguageServices.Handlers
         {
             logger.WriteLine("Removing source file '{0}'", fullPath);
             Context.RemoveSourceFile(fullPath);
+        }
+
+        protected override void HandleItemRename(string fullPathBefore, string fullPathAfter, IProjectLogger logger)
+        {
+            logger.WriteLine("Handling rename of source file '{0}' to {1}", fullPathBefore, fullPathAfter);
+            foreach (IFileRenameHandler fileRenameHandler in _fileRenameHandlers)
+            {
+                fileRenameHandler.HandleRename(fullPathBefore, fullPathAfter);
+            }
         }
 
         private IProjectChangeDiff ConvertToProjectDiff(BuildOptions added, BuildOptions removed)

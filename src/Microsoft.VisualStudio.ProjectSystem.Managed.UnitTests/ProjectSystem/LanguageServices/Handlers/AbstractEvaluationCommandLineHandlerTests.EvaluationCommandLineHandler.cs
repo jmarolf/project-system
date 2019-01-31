@@ -36,6 +36,8 @@ namespace Microsoft.VisualStudio.ProjectSystem.LanguageServices.Handlers
             {
                 Files.Remove(fullPath);
             }
+
+            protected override void HandleItemRename(string pathBefore, string pathAfter, IProjectLogger logger) { }
         }
     }
 }

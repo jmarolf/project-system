@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.LanguageServices.Handlers
     ///     to the compiler during design-time builds.
     /// </summary>
     [Export(typeof(IWorkspaceContextHandler))]
-    internal partial class SourceItemHandler : AbstractEvaluationCommandLineHandler, IProjectEvaluationHandler, ICommandLineHandler
+    internal partial class SourceItemHandler : AbstractEvaluationCommandLineHandler, IProjectEvaluationHandler, ICommandLineHandler, IProjectUpdatedHandler
     {
         private readonly UnconfiguredProject _project;
 
@@ -45,6 +45,23 @@ namespace Microsoft.VisualStudio.ProjectSystem.LanguageServices.Handlers
             VerifyInitialized();
 
             ApplyProjectEvaluation(version, projectChange.Difference, projectChange.After.Items, isActiveContext, logger);
+        }
+
+        public void HandleProjectUpdate(IComparable version, IProjectChangeDescription projectChange, bool isActiveContext, IProjectLogger logger)
+        {
+            Requires.NotNull(version, nameof(version));
+            Requires.NotNull(projectChange, nameof(projectChange));
+            Requires.NotNull(logger, nameof(logger));
+
+            VerifyInitialized();
+
+            if(projectChange.Difference.RenamedItems.Any())
+            {
+                foreach ((string original, string renamed) in projectChange.Difference.RenamedItems)
+                {
+                    HandleItemRename(original, renamed, logger);
+                }
+            }
         }
 
         public void Handle(IComparable version, BuildOptions added, BuildOptions removed, bool isActiveContext, IProjectLogger logger)

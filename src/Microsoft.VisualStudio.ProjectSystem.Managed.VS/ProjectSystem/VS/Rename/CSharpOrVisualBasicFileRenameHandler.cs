@@ -60,11 +60,11 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Rename
         public void HandleRename(string oldFilePath, string newFilePath)
         {
             // We do not need to block the completion of HandleRename so we queue it using the threading service
-            // and ignore the result.  
+            // and ignore the result.
             // NOTE: we queue work on JTF queue so VS shutdown can happen cleanly
-            _projectVsServices.ThreadingService.Fork(() => HandleRenameAsync(oldFilePath, newFilePath),
-                factory: _projectVsServices.ThreadingService.JoinableTaskFactory,
-                unconfiguredProject: _projectVsServices.Project);
+            _projectVsServices.ThreadingService.RunAndForget(
+                () => HandleRenameAsync(oldFilePath, newFilePath),
+                    unconfiguredProject: _projectVsServices.Project);
         }
 
         internal async Task HandleRenameAsync(string oldFilePath, string newFilePath)
@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Rename
             if (!success)
                 return;
 
-            // Check that the new name is a valid identifier in the the current programming language
+            // Check that the new name is a valid identifier in the current programming language
             string oldName = Path.GetFileNameWithoutExtension(oldFilePath);
             string newName = Path.GetFileNameWithoutExtension(newFilePath);
             if (!CanHandleRename(oldName, newName, isCaseSensitive))

@@ -108,7 +108,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.LanguageServices
             {
                 IComparable version = GetConfiguredProjectVersion(update);
 
-                return ProcessProjectUpdateHandlersAsync(version, projectChange, isActiveContext, cancellationToken);
+                return ProcessProjectUpdateHandlersAsync(version, update, isActiveContext, cancellationToken);
             }
 
             return Task.CompletedTask;

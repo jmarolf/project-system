@@ -316,7 +316,7 @@ namespace Microsoft.VisualStudio.ProjectSystem.VS.Tree.Dependencies.Snapshot
 
             var dependencyModel = new TestableDependencyModel(
                     projectPath,
-                    "ItemSpec", 
+                    "ItemSpec",
                     iconSet: new DependencyIconSet(KnownMonikers.Reference, KnownMonikers.Reference, KnownMonikers.Reference, KnownMonikers.Reference));
 
             var dependency = new Dependency(dependencyModel, ITargetFrameworkFactory.Implement("tfm2"), projectPath);

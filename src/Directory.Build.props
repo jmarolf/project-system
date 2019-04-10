@@ -8,15 +8,8 @@
 
   <Import Project="..\Directory.Build.props"/>
   <Import Project="$(RepoToolsetDir)Settings.props" Condition="'$(RepoToolsetDir)' != ''" />
-  <Import Project="..\build\VisualStudio.XamlRules.props" />
+  <Import Project="..\eng\VisualStudio.XamlRules.props" />
 
-  <PropertyGroup>
-    <_IsVisualStudioDeveloperBuild Condition="'$(OfficialBuild)' != 'true' AND '$(CIBuild)' != 'true' AND '$(BuildingInsideVisualStudio)' == 'true'">true</_IsVisualStudioDeveloperBuild>
-
-    <!-- Code Coverage doesn't currently work for portable/embedded PDBs - force to full inside Visual Studio builds -->
-    <DebugType Condition="'$(_IsVisualStudioDeveloperBuild)' == 'true'">full</DebugType>
-  </PropertyGroup>
-  
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
@@ -28,8 +21,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Language)' == 'VB'">
-    <!-- Build machines only have Visual Studio 15.5 (which comes with VB 15.3) -->
-    <LangVersion>15.3</LangVersion>
+    <LangVersion>15.5</LangVersion>
     <!-- The default is Embed -->
     <VBRuntime>Default</VBRuntime>
     <RemoveIntegerChecks>true</RemoveIntegerChecks>
@@ -37,8 +29,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <CodeAnalysisRuleSet Condition="'$(IsTestProject)' == 'true'">$(RepoRoot)build\Test.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisRuleSet Condition="'$(IsTestProject)' != 'true'">$(RepoRoot)build\Default.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition="'$(IsTestProject)' == 'true'">$(RepoRoot)eng\Test.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition="'$(IsTestProject)' != 'true'">$(RepoRoot)eng\Default.ruleset</CodeAnalysisRuleSet>
 
     <TestArchitectures>x86</TestArchitectures>
 

@@ -2,5 +2,5 @@
 <Project>
   <Import Project="..\Directory.Build.props"/>
   <Import Project="$(RepoToolsetDir)Settings.props" Condition="'$(RepoToolsetDir)' != ''" />
-  <Import Project="..\build\VisualStudio.XamlRules.props" />
+  <Import Project="..\eng\VisualStudio.XamlRules.props" />
 </Project>

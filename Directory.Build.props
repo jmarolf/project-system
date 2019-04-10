@@ -1,12 +1,6 @@
 <!-- Copyright (c)  Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information. -->
 <Project>
-  <Import Project="build\NuGet.props"/>
-  <Import Project="build\Versions.props"/>
-  <Import Project="build\RepoToolset\RestoreSources.props"/>
-
-  <ItemGroup>
-    <PackageReference Include="RoslynTools.RepoToolset" />
-  </ItemGroup>
+  <Import Project="eng\Versions.props"/>
 
   <PropertyGroup>
     <!-- Workaround for https://github.com/dotnet/sdk/issues/2288 -->
@@ -17,14 +11,6 @@
     <RestoreSources>$(RestoreSources);https://dotnet.myget.org/F/roslyn-tools/api/v3/index.json</RestoreSources>
     
     <RepoRoot>$(MSBuildThisFileDirectory)</RepoRoot>
-
-    <!--  
-      RepoToolset props and targets are conditionally imported based on whether RepoToolsetDir is set or not
-      to allow VS to load packages and perform automatic package restore. 
-      TODO: Remove once we can use a custom SDK (https://github.com/Microsoft/msbuild/issues/1493)
-    -->
-    <_RepoToolsetDir>$(NuGetPackageRoot)roslyntools.repotoolset\$(RoslynToolsRepoToolsetVersion)\tools\</_RepoToolsetDir>
-    <RepoToolsetDir Condition="'$(BuildingInsideVisualStudio)' != 'true' or Exists('$(_RepoToolsetDir)')">$(_RepoToolsetDir)</RepoToolsetDir>
 
     <RepositoryUrl>https://github.com/dotnet/project-system</RepositoryUrl>
     <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
@@ -50,12 +36,6 @@
       <_ActiveTFMFileDependencies Remove="@(_ActiveTFMFileDependencies->WithMetadataValue('FileGroup', 'RuntimeTarget'))" />
     </ItemGroup>
   </Target>
-
-  <!-- 
-    TODO: Import layout props so that design-time build executed before package restore is finished doesn't
-    product artifacts into wrong obj directories. Remove once we can use a custom SDK (https://github.com/Microsoft/msbuild/issues/1493)
-  -->
-  <Import Project="build\RepoToolset\ProjectLayout.props"/>
 
   <!--
     Determine whether the project is WPF temp project.

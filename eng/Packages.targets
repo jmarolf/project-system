@@ -19,12 +19,8 @@
   <ItemGroup>
 
     <!-- Toolset -->
-    <PackageReference Update="RoslynTools.VsixExpInstaller" Version="$(RoslynToolsVsixExpInstallerVersion)" />
     <PackageReference Update="RoslynDependencies.ProjectSystem.OptimizationData" Version="$(RoslynDependenciesProjectSystemOptimizationDataVersion)" />
-    <PackageReference Update="Microsoft.DotNet.IBCMerge" Version="[$(MicrosoftDotNetIBCMergeVersion)]" />
     <PackageReference Update="Microsoft.DiaSymReader.Pdb2Pdb" Version="$(MicrosoftDiaSymReaderPdb2PdbVersion)" />
-    <PackageReference Update="OpenCover" Version="$(OpenCoverVersion)" />
-    <PackageReference Update="Codecov" Version="$(CodecovVersion)" />
     <PackageReference Update="Microsoft.DevDiv.Validation.MediaRecorder" Version="$(MicrosoftDevDivValidationMediaRecorderVersion)" />
     <PackageReference Update="Microsoft.DevDiv.Validation.Logging.ScreenshotCollector" Version="$(MicrosoftDevDivValidationLoggingScreenshotCollectorVersion)" />
 
@@ -131,10 +127,6 @@
     <PackageReference Update="xunit.runner.console" Version="$(XUnitVersion)" />
     <PackageReference Update="xunit.analyzers" Version="0.10.0"/>
     <PackageReference Update="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNETTestSdkVersion)" />
-
-    <PackageReference Update="Microsoft.DotNet.Test.ProjectTemplates.1.x" Version="$(MicrosoftDotNetProjectTemplatesVersion)" />
-    <PackageReference Update="Microsoft.DotNet.Common.ProjectTemplates.1.x" Version="$(MicrosoftDotNetProjectTemplatesVersion)" />
-    
   </ItemGroup>
   
 </Project>

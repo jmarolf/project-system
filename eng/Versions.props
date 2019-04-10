@@ -11,5 +11,38 @@
     <!-- Opt-in repo features -->
     <UsingToolVSSDK>true</UsingToolVSSDK>
     <UsingToolIbcOptimization>true</UsingToolIbcOptimization>
+    
+    <!-- Dependencies -->
+    <RoslynDependenciesProjectSystemOptimizationDataVersion>2.6.0-beta1-62205-02</RoslynDependenciesProjectSystemOptimizationDataVersion>
+    <MicrosoftNetCompilersVersion>2.11.0-beta2-63529-05</MicrosoftNetCompilersVersion>
+    <MicrosoftDiaSymReaderPdb2PdbVersion>1.1.0-beta1-62624-01</MicrosoftDiaSymReaderPdb2PdbVersion>
+    <RoslynAnalyzersPackagesVersion>2.6.3-beta1.19059.2</RoslynAnalyzersPackagesVersion>
+    <MicrosoftDevDivValidationMediaRecorderVersion>15.0.199</MicrosoftDevDivValidationMediaRecorderVersion>
+    <MicrosoftDevDivValidationLoggingScreenshotCollectorVersion>1.1.86</MicrosoftDevDivValidationLoggingScreenshotCollectorVersion>
+    <MicrosoftVisualStudioSetupConfigurationInteropVersion>1.16.30</MicrosoftVisualStudioSetupConfigurationInteropVersion>
+    
+    <!-- Tests -->
+    <XUnitVersion>2.4.1</XUnitVersion>
   </PropertyGroup>
+  
+  <PropertyGroup>
+    <RestoreSources>
+      $(RestoreSources);
+      https://dotnet.myget.org/F/roslyn-tools/api/v3/index.json;
+      https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json;
+      https://vside.myget.org/F/devcore/api/v3/index.json;
+      https://vside.myget.org/F/vs-impl/api/v3/index.json;
+      https://vside.myget.org/F/vssdk/api/v3/index.json;
+      https://dotnet.myget.org/F/msbuild/api/v3/index.json;
+      https://dotnet.myget.org/F/nuget-build/api/v3/index.json;
+      https://dotnet.myget.org/F/roslyn/api/v3/index.json;
+      https://dotnet.myget.org/F/roslyn-analyzers/api/v3/index.json;
+      https://dotnet.myget.org/F/roslyn-tools/api/v3/index.json;
+      https://dotnet.myget.org/F/templating/api/v3/index.json;
+      https://dotnet.myget.org/F/project-system-interop/api/v3/index.json;
+      https://dotnet.myget.org/F/symreader-converter/api/v3/index.json;
+      https://www.myget.org/F/xunit/api/v3/index.json;
+      https://api.nuget.org/v3/index.json
+    </RestoreSources>
+</PropertyGroup>
 </Project>

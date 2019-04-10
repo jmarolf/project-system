@@ -5,13 +5,14 @@
     <RootNamespace>Microsoft.VisualStudio</RootNamespace>
     <!-- The value of RuleInjectionClassName of XamlPropertyRule items defined by this project -->
     <XamlPropertyRuleInjectionClassName>ProjectProperties</XamlPropertyRuleInjectionClassName>
+    <Deterministic>false</Deterministic>
     
     <!-- Nuget -->
     <IsPackable>true</IsPackable>
     <Description>Microsoft VisualStudio ProjectSystem for Managed languages Projects</Description>
     <Summary>Microsoft VisualStudio Managed Project System</Summary>
     <PackageTags>Roslyn Managed Project System VisualStudio</PackageTags>
-    <NoWarn>$(NoWarn);NU5125</NoWarn>
+    <NoWarn>$(NoWarn);NU5125lCS1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Microsoft.VisualStudio.ProjectSystem.Managed.VS" />

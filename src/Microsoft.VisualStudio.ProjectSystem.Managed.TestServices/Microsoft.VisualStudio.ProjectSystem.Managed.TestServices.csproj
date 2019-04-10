@@ -3,6 +3,7 @@
   <Import Project="..\HostAgnostic.props" />
   <PropertyGroup>    
     <PublishOutputToSymStore>false</PublishOutputToSymStore>
+    <Deterministic>false</Deterministic>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Moq" />

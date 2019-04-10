@@ -23,6 +23,7 @@
     
     <!-- Tests -->
     <XUnitVersion>2.4.1</XUnitVersion>
+    <MicrosoftNETTestSdkVersion>16.0.1</MicrosoftNETTestSdkVersion>
   </PropertyGroup>
   
   <PropertyGroup>

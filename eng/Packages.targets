@@ -119,11 +119,11 @@
     <PackageReference Update="Newtonsoft.Json" Version="9.0.1"/>
 
     <!-- Tests -->
-    <PackageReference Update="Moq" Version="4.9.0"/>
+    <PackageReference Update="Moq" Version="4.10.1 "/>
     <PackageReference Update="xunit" Version="$(XUnitVersion)" />
     <PackageReference Update="xunit.assert" Version="$(XunitVersion)" />
     <PackageReference Update="xunit.extensibility.core" Version="$(XunitVersion)" />
-    <PackageReference Update="xunit.runner.visualstudio" Version="$(XUnitRunnerVisualStudioVersion)" />
+    <PackageReference Update="xunit.runner.visualstudio" Version="$(XunitVersion)" />
     <PackageReference Update="xunit.runner.console" Version="$(XUnitVersion)" />
     <PackageReference Update="xunit.analyzers" Version="0.10.0"/>
     <PackageReference Update="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNETTestSdkVersion)" />

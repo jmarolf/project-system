@@ -140,15 +140,15 @@ function LocateVisualStudio {
 
 function LocateMSBuild {
 
-  # Dev15
-  $msbuildExe = Join-Path $vsInstallDir "MSBuild\15.0\Bin\msbuild.exe"
+  # Dev16
+  $msbuildExe = Join-Path $vsInstallDir "MSBuild\Current\Bin\msbuild.exe"
   
   if (Test-Path $msbuildExe) {
      return $msbuildExe
   }
 
-  # Dev16
-  return Join-Path $vsInstallDir "MSBuild\Current\Bin\msbuild.exe"
+  # Dev15
+  return Join-Path $vsInstallDir "MSBuild\15.0\Bin\msbuild.exe"
 }
 
 function Get-VisualStudioId(){
